@@ -56,5 +56,5 @@ var server = http.createServer(function (req, res) {
 });
 
 server.listen(PORT, '0.0.0.0', function () {
-  console.log('Guardian.js demo running on port ' + PORT);
+  console.log('Coded by Jaymar Xedd ' + PORT);
 });

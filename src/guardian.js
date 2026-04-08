@@ -1,4 +1,3 @@
-/** @module Guardian */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
     ? (module.exports = factory())
@@ -36,7 +35,6 @@
     initialized: false,
   };
 
-  /** @namespace DebuggerTrap */
   var DebuggerTrap = {
     /**
      * @param {number} intervalMs
@@ -52,7 +50,6 @@
       }, intervalMs || 100);
     },
 
-    /** */
     stop: function () {
       if (_state.trapTimer) {
         clearInterval(_state.trapTimer);
@@ -61,7 +58,6 @@
     },
   };
 
-  /** @namespace DevToolsDetector */
   var DevToolsDetector = {
     _methods: [],
 
@@ -140,7 +136,6 @@
       }, intervalMs || 800);
     },
 
-    /** */
     stopPolling: function () {
       if (_state.detectionTimer) {
         clearInterval(_state.detectionTimer);
@@ -149,7 +144,6 @@
     },
   };
 
-  /** @namespace AntiInspect */
   var AntiInspect = {
     /** @type {Array.<{key: string, ctrl?: boolean, shift?: boolean}>} */
     _blockedKeys: [
@@ -192,27 +186,23 @@
       return false;
     },
 
-    /** */
     enable: function () {
       document.addEventListener('keydown', AntiInspect._keyHandler, true);
       document.addEventListener('contextmenu', AntiInspect._contextHandler, true);
     },
 
-    /** */
     disable: function () {
       document.removeEventListener('keydown', AntiInspect._keyHandler, true);
       document.removeEventListener('contextmenu', AntiInspect._contextHandler, true);
     },
   };
 
-  /** @namespace ConsoleShield */
   var ConsoleShield = {
     /** @type {Object} */
     _original: {},
     /** @private */
     _noop: function () {},
 
-    /** */
     enable: function () {
       var methods = [
         'log', 'debug', 'info', 'warn', 'error',
@@ -225,7 +215,6 @@
       }
     },
 
-    /** */
     disable: function () {
       for (var key in ConsoleShield._original) {
         console[key] = ConsoleShield._original[key];
@@ -233,7 +222,6 @@
     },
   };
 
-  /** @namespace ContentProtection */
   var ContentProtection = {
     /**
      * @param {Event} e
@@ -260,7 +248,6 @@
       return false;
     },
 
-    /** */
     enableAntiSelect: function () {
       document.addEventListener('selectstart', ContentProtection._selectHandler, true);
       document.body.style.userSelect = 'none';
@@ -269,21 +256,18 @@
       document.body.style.msUserSelect = 'none';
     },
 
-    /** */
     enableAntiCopy: function () {
       document.addEventListener('copy', ContentProtection._copyHandler, true);
       document.addEventListener('cut', ContentProtection._copyHandler, true);
       document.addEventListener('dragstart', ContentProtection._dragHandler, true);
     },
 
-    /** */
     disableAntiSelect: function () {
       document.removeEventListener('selectstart', ContentProtection._selectHandler, true);
       document.body.style.userSelect = '';
       document.body.style.webkitUserSelect = '';
     },
 
-    /** */
     disableAntiCopy: function () {
       document.removeEventListener('copy', ContentProtection._copyHandler, true);
       document.removeEventListener('cut', ContentProtection._copyHandler, true);
@@ -291,9 +275,7 @@
     },
   };
 
-  /** @namespace SourceProtection */
   var SourceProtection = {
-    /** */
     enable: function () {
       if (
         window.location.href.indexOf('view-source:') === 0 ||
@@ -311,7 +293,6 @@
     },
   };
 
-  /** @namespace ActionEngine */
   var ActionEngine = {
     /**
      * @param {Object} cfg
@@ -338,7 +319,6 @@
       }
     },
 
-    /** */
     restore: function () {
       document.body.style.filter = '';
       document.body.style.pointerEvents = '';
