@@ -1,8 +1,13 @@
 # Guardian.js
 
+![Language](https://img.shields.io/badge/language-JavaScript-f7df1e?style=flat-square&logo=javascript&logoColor=black)
+![Module](https://img.shields.io/badge/module-UMD-blue?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
+![Dependencies](https://img.shields.io/badge/dependencies-none-lightgrey?style=flat-square)
+
 Client-side browser security library. Drop it in, call `init()`, and it handles the rest.
 
-Works as a UMD module — no bundler required, no dependencies.
+Works as a UMD module — no bundler required, no dependencies. Plain ES5 JavaScript, runs in any browser.
 
 ---
 
