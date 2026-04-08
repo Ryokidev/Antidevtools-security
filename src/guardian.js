@@ -1,11 +1,3 @@
-/** @Developed By Jaymar Xedd
- * @module Guardian
- * @description A comprehensive JavaScript library for protecting web applications from various security threats and unauthorized access.
- * fell free to use this code for your own project
- * @version 1.0.0
- * @author Jaymar Xedd
- */
-
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
     ? (module.exports = factory())
@@ -26,11 +18,17 @@
     consoleShield: false,
     antiSelect: false,
     antiCopy: false,
+    antiIframe: true,
+    headlessDetection: true,
+    tamperDetection: true,
+    domWatermark: false,
     action: 'warn',
     redirectUrl: '',
     warnMessage: '[Guardian] DevTools detected. Access restricted.',
     onDevToolsOpen: null,
     onDevToolsClose: null,
+    onHeadlessDetected: null,
+    onTamperDetected: null,
     trapInterval: 100,
     detectionInterval: 800,
   };
@@ -41,6 +39,7 @@
     trapTimer: null,
     detectionTimer: null,
     initialized: false,
+    watermarkToken: null,
   };
 
   var DebuggerTrap = {
@@ -156,13 +155,14 @@
     /** @type {Array.<{key: string, ctrl?: boolean, shift?: boolean}>} */
     _blockedKeys: [
       { key: 'F12' },
-      { key: 'I', ctrl: true, shift: true },
-      { key: 'J', ctrl: true, shift: true },
-      { key: 'C', ctrl: true, shift: true },
-      { key: 'U', ctrl: true },
-      { key: 'S', ctrl: true },
-      { key: 'P', ctrl: true, shift: true },
-      { key: 'F5', ctrl: true },
+      { key: 'I',           ctrl: true, shift: true },
+      { key: 'J',           ctrl: true, shift: true },
+      { key: 'C',           ctrl: true, shift: true },
+      { key: 'U',           ctrl: true },
+      { key: 'S',           ctrl: true },
+      { key: 'P',           ctrl: true, shift: true },
+      { key: 'F5',          ctrl: true },
+      { key: 'PrintScreen' },
     ],
 
     /**
@@ -171,11 +171,10 @@
     _keyHandler: function (e) {
       for (var i = 0; i < AntiInspect._blockedKeys.length; i++) {
         var rule = AntiInspect._blockedKeys[i];
-        var keyMatch = e.key === rule.key || e.keyCode === (rule.keyCode || 0);
         var ctrlMatch = rule.ctrl ? e.ctrlKey || e.metaKey : true;
         var shiftMatch = rule.shift ? e.shiftKey : true;
         if (
-          (e.key === rule.key || e.code === 'F12' && rule.key === 'F12') &&
+          (e.key === rule.key || (e.code === 'F12' && rule.key === 'F12')) &&
           ctrlMatch &&
           shiftMatch
         ) {
@@ -333,6 +332,118 @@
     },
   };
 
+  var HeadlessDetector = {
+    /**
+     * @returns {boolean}
+     */
+    isHeadless: function () {
+      if (navigator.webdriver) return true;
+      if (/HeadlessChrome|PhantomJS/.test(navigator.userAgent)) return true;
+      if (window._phantom || window.callPhantom || window.__phantomas) return true;
+      if (navigator.plugins.length === 0 && !/Firefox/.test(navigator.userAgent)) return true;
+      if (!window.chrome && /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent)) return true;
+      if (typeof navigator.permissions === 'undefined') return true;
+      return false;
+    },
+
+    /**
+     * @param {Function} onDetected
+     */
+    check: function (onDetected) {
+      if (HeadlessDetector.isHeadless()) {
+        if (typeof onDetected === 'function') onDetected();
+      }
+    },
+  };
+
+  var AntiIframe = {
+    enable: function () {
+      try {
+        if (top !== self) {
+          top.location = self.location.href;
+        }
+      } catch (e) {
+        document.body.innerHTML = '';
+        document.body.style.background = '#000';
+      }
+
+      Object.defineProperty(document, 'referrer', {
+        get: function () { return ''; },
+        configurable: true,
+      });
+    },
+  };
+
+  var TamperDetector = {
+    /** @type {Object} */
+    _snapshots: {},
+
+    capture: function () {
+      TamperDetector._snapshots.init    = Guardian.init.toString();
+      TamperDetector._snapshots.destroy = Guardian.destroy.toString();
+      TamperDetector._snapshots.config  = Guardian.config.toString();
+    },
+
+    /**
+     * @returns {boolean}
+     */
+    isIntact: function () {
+      return (
+        Guardian.init.toString()    === TamperDetector._snapshots.init &&
+        Guardian.destroy.toString() === TamperDetector._snapshots.destroy &&
+        Guardian.config.toString()  === TamperDetector._snapshots.config
+      );
+    },
+
+    /**
+     * @param {Function} onTamper
+     * @param {number}   intervalMs
+     */
+    startPolling: function (onTamper, intervalMs) {
+      setInterval(function () {
+        if (!TamperDetector.isIntact()) {
+          if (typeof onTamper === 'function') onTamper();
+        }
+      }, intervalMs || 1000);
+    },
+  };
+
+  var DOMWatermark = {
+    /**
+     * @returns {string}
+     */
+    _generate: function () {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+    },
+
+    /**
+     * @returns {string}
+     */
+    inject: function () {
+      var token = DOMWatermark._generate();
+      _state.watermarkToken = token;
+
+      var meta = document.createElement('meta');
+      meta.name = 'x-session-id';
+      meta.content = token;
+      document.head.appendChild(meta);
+
+      var node = document.createElement('span');
+      node.setAttribute('data-guardian-wm', token);
+      node.style.cssText = 'position:fixed;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;';
+      document.body.appendChild(node);
+
+      return token;
+    },
+
+    /**
+     * @returns {string|null}
+     */
+    getToken: function () {
+      return _state.watermarkToken;
+    },
+  };
+
   /**
    * @param {Object} [userConfig]
    * @returns {Object}
@@ -344,6 +455,19 @@
     _state.initialized = true;
 
     if (typeof document === 'undefined') return Guardian;
+
+    if (_config.antiIframe) {
+      AntiIframe.enable();
+    }
+
+    if (_config.headlessDetection) {
+      HeadlessDetector.check(function () {
+        ActionEngine.execute(_config);
+        if (typeof _config.onHeadlessDetected === 'function') {
+          _config.onHeadlessDetected();
+        }
+      });
+    }
 
     if (_config.antiInspect) {
       AntiInspect.enable();
@@ -359,6 +483,10 @@
 
     if (_config.antiCopy) {
       ContentProtection.enableAntiCopy();
+    }
+
+    if (_config.domWatermark) {
+      DOMWatermark.inject();
     }
 
     SourceProtection.enable();
@@ -383,6 +511,16 @@
           }
         }
       );
+    }
+
+    if (_config.tamperDetection) {
+      TamperDetector.capture();
+      TamperDetector.startPolling(function () {
+        ActionEngine.execute(_config);
+        if (typeof _config.onTamperDetected === 'function') {
+          _config.onTamperDetected();
+        }
+      }, 1000);
     }
 
     return Guardian;
@@ -425,6 +563,13 @@
     return _state.devToolsOpen;
   };
 
+  /**
+   * @returns {string|null}
+   */
+  Guardian.getWatermarkToken = function () {
+    return DOMWatermark.getToken();
+  };
+
   /** @type {Object} */
   Guardian.modules = {
     DebuggerTrap: DebuggerTrap,
@@ -434,6 +579,10 @@
     ContentProtection: ContentProtection,
     SourceProtection: SourceProtection,
     ActionEngine: ActionEngine,
+    HeadlessDetector: HeadlessDetector,
+    AntiIframe: AntiIframe,
+    TamperDetector: TamperDetector,
+    DOMWatermark: DOMWatermark,
   };
 
   return Guardian;
