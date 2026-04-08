@@ -1,0 +1,16 @@
+{
+  "name": "guardian-js",
+  "version": "1.0.0",
+  "description": "Browser security package — debugger trap, anti-devtools, anti-inspect, console shield",
+  "main": "src/guardian.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["security", "devtools", "anti-inspect", "debugger", "browser"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^22.13.11"
+  }
+}
