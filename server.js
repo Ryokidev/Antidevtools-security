@@ -1,20 +1,13 @@
-/**
- * server.js
- * Minimal Node.js HTTP server that serves the Guardian.js demo page
- * and the guardian.js library file as static assets.
- */
+/** @module server */
 
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
 
-/** @type {number} Port the server binds to. Defaults to 5000. */
+/** @type {number} */
 var PORT = process.env.PORT || 5000;
 
-/**
- * MIME type map keyed by file extension.
- * @type {Object.<string, string>}
- */
+/** @type {Object.<string, string>} */
 var MIME = {
   '.html': 'text/html',
   '.js':   'application/javascript',
@@ -24,10 +17,7 @@ var MIME = {
   '.ico':  'image/x-icon',
 };
 
-/**
- * Static route table mapping URL paths to filesystem locations.
- * @type {Object.<string, string>}
- */
+/** @type {Object.<string, string>} */
 var routes = {
   '/':            path.join(__dirname, 'demo', 'index.html'),
   '/index.html':  path.join(__dirname, 'demo', 'index.html'),
@@ -35,9 +25,6 @@ var routes = {
 };
 
 /**
- * HTTP request handler.
- * Resolves the URL against the route table and serves the matching file.
- * Responds with 204 for unknown routes (silently ignores favicon, etc.).
  * @param {http.IncomingMessage} req
  * @param {http.ServerResponse}  res
  */
@@ -68,9 +55,6 @@ var server = http.createServer(function (req, res) {
   });
 });
 
-/**
- * Start listening on all interfaces.
- */
 server.listen(PORT, '0.0.0.0', function () {
   console.log('Guardian.js demo running on port ' + PORT);
 });
