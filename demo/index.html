@@ -471,6 +471,50 @@
         <span class="tag tag-green">custom</span>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h2>Headless Detection</h2>
+      <p>Detects Puppeteer, Playwright, PhantomJS, and Selenium by checking <code>navigator.webdriver</code>, plugin count, user-agent strings, and missing browser APIs common in automation environments.</p>
+      <div class="tag-list">
+        <span class="tag tag-red">navigator.webdriver</span>
+        <span class="tag tag-purple">UA check</span>
+        <span class="tag tag-orange">plugin count</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🖼️</div>
+      <h2>Anti-Iframe</h2>
+      <p>Detects when the page is loaded inside a foreign iframe and immediately busts out. If the framebusting is blocked by a sandbox attribute, the document body is wiped instead.</p>
+      <div class="tag-list">
+        <span class="tag tag-red">Frame bust</span>
+        <span class="tag tag-blue">top !== self</span>
+        <span class="tag tag-purple">Sandbox fallback</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h2>Tamper Detection</h2>
+      <p>Snapshots the string representation of critical Guardian functions on init, then re-checks them every second. Fires the action engine if any function has been patched or replaced at runtime.</p>
+      <div class="tag-list">
+        <span class="tag tag-red">Function snapshot</span>
+        <span class="tag tag-blue">Polling</span>
+        <span class="tag tag-orange">toString check</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">💧</div>
+      <h2>DOM Watermark</h2>
+      <p>Injects a unique per-session token into a hidden DOM node and a <code>&lt;meta&gt;</code> tag on every page load. Allows scraped HTML to be traced back to a specific session.</p>
+      <div class="tag-list">
+        <span class="tag tag-green">Session token</span>
+        <span class="tag tag-blue">meta tag</span>
+        <span class="tag tag-purple">Hidden node</span>
+      </div>
+    </div>
   </div>
 
   <!-- Live Controls -->
@@ -501,6 +545,22 @@
       <label class="toggle-row">
         <span class="toggle-label">📋 Anti-Copy</span>
         <span class="toggle"><input type="checkbox" id="cfg-copy"><span class="slider"></span></span>
+      </label>
+      <label class="toggle-row">
+        <span class="toggle-label">🤖 Headless Detection</span>
+        <span class="toggle"><input type="checkbox" id="cfg-headless" checked><span class="slider"></span></span>
+      </label>
+      <label class="toggle-row">
+        <span class="toggle-label">🖼️ Anti-Iframe</span>
+        <span class="toggle"><input type="checkbox" id="cfg-iframe" checked><span class="slider"></span></span>
+      </label>
+      <label class="toggle-row">
+        <span class="toggle-label">🔒 Tamper Detection</span>
+        <span class="toggle"><input type="checkbox" id="cfg-tamper" checked><span class="slider"></span></span>
+      </label>
+      <label class="toggle-row">
+        <span class="toggle-label">💧 DOM Watermark</span>
+        <span class="toggle"><input type="checkbox" id="cfg-watermark"><span class="slider"></span></span>
       </label>
     </div>
 
@@ -650,6 +710,10 @@
         consoleShield:     document.getElementById('cfg-console').checked,
         antiSelect:        document.getElementById('cfg-select').checked,
         antiCopy:          document.getElementById('cfg-copy').checked,
+        headlessDetection: document.getElementById('cfg-headless').checked,
+        antiIframe:        document.getElementById('cfg-iframe').checked,
+        tamperDetection:   document.getElementById('cfg-tamper').checked,
+        domWatermark:      document.getElementById('cfg-watermark').checked,
       };
 
       if (action === 'overlay') {
