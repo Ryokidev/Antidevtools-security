@@ -1,3 +1,11 @@
+/** @Developed By Jaymar Xedd
+ * @module Guardian
+ * @description A comprehensive JavaScript library for protecting web applications from various security threats and unauthorized access.
+ * fell free to use this code for your own project
+ * @version 1.0.0
+ * @author Jaymar Xedd
+ */
+
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
     ? (module.exports = factory())
