@@ -163,7 +163,3 @@ The tamper detection and headless checks in particular are heuristics. They'll c
 The debugger trap is the most effective piece — it genuinely makes DevTools unusable while active. Everything else is defense in depth.
 
 ---
-
-## License
-
-MIT

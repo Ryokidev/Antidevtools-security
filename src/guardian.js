@@ -4,6 +4,7 @@
  * fell free to use this code for your own project
  * @version 1.0.0
  * @author Jaymar Xedd
+ * @license MIT 
  */
 
 (function (global, factory) {
