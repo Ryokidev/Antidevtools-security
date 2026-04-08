@@ -32,13 +32,6 @@
     initialized: false,
   };
 
-  /* ─────────────────────────────────────────
-     1. DEBUGGER TRAP
-     Continuously fires the debugger statement.
-     When DevTools is open the browser pauses here
-     on every interval tick, making the page unusable
-     for anyone trying to inspect it.
-  ───────────────────────────────────────── */
   var DebuggerTrap = {
     start: function (intervalMs) {
       if (_state.trapTimer) return;
@@ -58,15 +51,9 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     2. DEVTOOLS DETECTION
-     Uses four independent heuristics. Any one
-     triggering marks devtools as open.
-  ───────────────────────────────────────── */
   var DevToolsDetector = {
     _methods: [],
 
-    /* 2a. Window-size delta (works for undocked devtools) */
     _sizeCheck: function () {
       var threshold = 160;
       return (
@@ -75,15 +62,12 @@
       );
     },
 
-    /* 2b. Debugger timing (devtools slows eval dramatically) */
     _timingCheck: function () {
       var start = performance.now();
       (function () {}.constructor('debugger')());
       return performance.now() - start > 20;
     },
 
-    /* 2c. toString override trick (only fires when object is
-           logged and devtools formats it) */
     _toStringCheck: (function () {
       var triggered = false;
       var sentinel = Object.defineProperty({}, 'id', {
@@ -99,7 +83,6 @@
       };
     })(),
 
-    /* 2d. Firebug legacy check */
     _firebugCheck: function () {
       return !!(window.console && window.console.firebug);
     },
@@ -134,11 +117,6 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     3. ANTI-INSPECT
-     Blocks all common browser shortcuts and gestures
-     used to open developer tools or view source.
-  ───────────────────────────────────────── */
   var AntiInspect = {
     _blockedKeys: [
       { key: 'F12' },
@@ -185,11 +163,6 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     4. CONSOLE SHIELD
-     Overrides all console methods so no output
-     leaks through the browser console.
-  ───────────────────────────────────────── */
   var ConsoleShield = {
     _original: {},
     _noop: function () {},
@@ -213,10 +186,6 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     5. ANTI-SELECT / ANTI-COPY
-     Prevents text selection and clipboard access.
-  ───────────────────────────────────────── */
   var ContentProtection = {
     _selectHandler: function (e) {
       e.preventDefault();
@@ -259,11 +228,6 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     6. SOURCE PROTECTION
-     Blocks view-source and attempts to redirect
-     away from common source-viewing URIs.
-  ───────────────────────────────────────── */
   var SourceProtection = {
     enable: function () {
       if (
@@ -282,11 +246,6 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     7. ACTION ENGINE
-     Performs the configured action when
-     devtools is detected.
-  ───────────────────────────────────────── */
   var ActionEngine = {
     execute: function (cfg) {
       switch (cfg.action) {
@@ -315,9 +274,6 @@
     },
   };
 
-  /* ─────────────────────────────────────────
-     PUBLIC API
-  ───────────────────────────────────────── */
   Guardian.init = function (userConfig) {
     if (_state.initialized) return Guardian;
 

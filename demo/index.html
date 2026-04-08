@@ -603,7 +603,6 @@
     var selectedAction = 'overlay';
     var guardianActive = false;
 
-    // Tab switching
     document.querySelectorAll('.tab').forEach(function(tab) {
       tab.addEventListener('click', function() {
         document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
@@ -615,7 +614,6 @@
       });
     });
 
-    // Action buttons
     document.querySelectorAll('.action-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.action-btn').forEach(function(b) { b.classList.remove('active'); });
